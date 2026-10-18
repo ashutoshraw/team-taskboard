@@ -1,0 +1,5 @@
+{
+  "name": "team-taskboard",
+  "private": true,
+  "workspaces": ["shared", "server", "client"]
+}
