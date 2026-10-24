@@ -4,6 +4,7 @@ import { useTheme } from "./hooks/useTheme";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import LandingPage from "./pages/LandingPage";
+import DashboardPage from "./pages/DashboardPage";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { accessToken } = useAuthStore();
@@ -22,10 +23,15 @@ function App() {
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <div>Dashboard coming soon</div>
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
+        <Route path="/workspace/:id" element={
+          <ProtectedRoute>
+            <div>Workspace coming soon</div>
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   );
