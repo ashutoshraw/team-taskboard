@@ -139,3 +139,87 @@ export const deleteWorkspace = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const getMembers = async (req: AuthRequest, res: Response) => {
+  const userId = req.userId!;
+  const { id } = req.params;
+  try {
+    const member = await query(
+      "SELECT role FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [id, userId]
+    );
+    if (member.rows.length === 0) {
+      res.status(403).json({ error: "Access denied" });
+      return;
+    }
+    const result = await query(
+      `SELECT u.id, u.name, u.email, wm.role, wm.joined_at
+       FROM workspace_members wm
+       INNER JOIN users u ON u.id = wm.user_id
+       WHERE wm.workspace_id = $1
+       ORDER BY wm.role ASC, u.name ASC`,
+      [id]
+    );
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const removeMember = async (req: AuthRequest, res: Response) => {
+  const userId = req.userId!;
+  const { id, memberId } = req.params;
+  try {
+    const admin = await query(
+      "SELECT role FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [id, userId]
+    );
+    if (admin.rows[0]?.role !== "admin") {
+      res.status(403).json({ error: "Only admins can remove members" });
+      return;
+    }
+    if (Number(memberId) === userId) {
+      res.status(400).json({ error: "You cannot remove yourself" });
+      return;
+    }
+    await query(
+      "DELETE FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [id, memberId]
+    );
+    res.json({ message: "Member removed" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const leaveWorkspace = async (req: AuthRequest, res: Response) => {
+  const userId = req.userId!;
+  const { id } = req.params;
+  try {
+    const member = await query(
+      "SELECT role FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [id, userId]
+    );
+    if (member.rows.length === 0) {
+      res.status(404).json({ error: "Not a member" });
+      return;
+    }
+    if (member.rows[0].role === "admin") {
+      const otherAdmins = await query(
+        "SELECT id FROM workspace_members WHERE workspace_id = $1 AND role = 'admin' AND user_id != $2",
+        [id, userId]
+      );
+      if (otherAdmins.rows.length === 0) {
+        res.status(400).json({ error: "You are the only admin. Assign another admin before leaving." });
+        return;
+      }
+    }
+    await query(
+      "DELETE FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [id, userId]
+    );
+    res.json({ message: "Left workspace" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};

@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
+import WorkspacePage from "./pages/WorkspacePage";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { accessToken } = useAuthStore();
@@ -19,19 +20,9 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route path="/workspace/:id" element={
-          <ProtectedRoute>
-            <div>Workspace coming soon</div>
-          </ProtectedRoute>
-        } />
+        <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
+        <Route path="/workspace/:id" element={<ProtectedRoute><WorkspacePage /></ProtectedRoute>} />
+        <Route path="/board/:id" element={<ProtectedRoute><div>Board coming soon</div></ProtectedRoute>} />
       </Routes>
     </BrowserRouter>
   );

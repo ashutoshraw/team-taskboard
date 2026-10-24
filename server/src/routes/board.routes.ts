@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../middleware/auth";
-import { createBoard, getBoards, getBoard } from "../controllers/board.controller";
+import { createBoard, getBoards, getBoard, updateBoard, deleteBoard } from "../controllers/board.controller";
 import { createColumn, updateColumn, deleteColumn } from "../controllers/column.controller";
 import { createCard, updateCard, deleteCard, getCardActivity } from "../controllers/card.controller";
 
@@ -11,6 +11,8 @@ router.use(authenticate);
 router.post("/", createBoard);
 router.get("/workspace/:workspaceId", getBoards);
 router.get("/:id", getBoard);
+router.put("/:id", updateBoard);
+router.delete("/:id", deleteBoard);
 
 router.post("/columns", createColumn);
 router.put("/columns/:id", updateColumn);

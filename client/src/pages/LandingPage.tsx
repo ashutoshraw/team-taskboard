@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useTheme } from "../hooks/useTheme";
 import Button from "../components/Button";
 import styles from "./LandingPage.module.css";
+import HeroBackground from "../components/HeroBackground";
 
 const BOARD_DATA = [
   {
@@ -119,67 +120,69 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      <section className={styles.hero}>
-        <div className={styles.badge}>
-          <span className={styles.badgeDot} />
-          Real-time collaboration for teams
+     <section className={styles.hero} style={{ position: "relative", overflow: "hidden" }}>
+  <HeroBackground />
+  <div className={styles.heroInner}>
+    <div className={styles.badge}>
+      <span className={styles.badgeDot} />
+      Real-time collaboration for teams
+    </div>
+
+    <h1 className={styles.heroTitle}>
+      Your team's work,<br />
+      <span className={styles.gradientText}>always in sync</span>
+    </h1>
+
+    <p className={styles.heroSubtitle}>
+      A Kanban board where changes appear instantly for everyone.
+      Move a card, and your whole team sees it in under a second.
+    </p>
+
+    <div className={styles.heroActions}>
+      <Button to="/register" size="lg">Start for free</Button>
+      <Button variant="ghost" to="/login" size="lg">Sign in</Button>
+    </div>
+
+    <div className={styles.boardPreview}>
+      <div className={styles.boardPreviewHeader}>
+        <div className={styles.dot} style={{ background: "#ff5c5c" }} />
+        <div className={styles.dot} style={{ background: "#f59e0b" }} />
+        <div className={styles.dot} style={{ background: "#4caf82" }} />
+        <span className={styles.boardName}>Sprint 3 — Team Board</span>
+        <div className={styles.liveIndicator}>
+          <span className={styles.liveDot} />
+          3 members online
         </div>
+      </div>
 
-        <h1 className={styles.heroTitle}>
-          Your team's work,<br />
-          <span className={styles.gradientText}>always in sync</span>
-        </h1>
-
-        <p className={styles.heroSubtitle}>
-          A Kanban board where changes appear instantly for everyone.
-          Move a card, and your whole team sees it in under a second.
-        </p>
-
-        <div className={styles.heroActions}>
-          <Button to="/register" size="lg">Start for free</Button>
-          <Button variant="ghost" to="/login" size="lg">Sign in</Button>
-        </div>
-
-        <div className={styles.boardPreview}>
-          <div className={styles.boardPreviewHeader}>
-            <div className={styles.dot} style={{ background: "#ff5c5c" }} />
-            <div className={styles.dot} style={{ background: "#f59e0b" }} />
-            <div className={styles.dot} style={{ background: "#4caf82" }} />
-            <span className={styles.boardName}>Sprint 3 — Team Board</span>
-            <div className={styles.liveIndicator}>
-              <span className={styles.liveDot} />
-              3 members online
-            </div>
-          </div>
-
-          <div className={styles.columns}>
-            {BOARD_DATA.map((col) => (
-              <div key={col.title} className={styles.column}>
-                <div className={styles.columnTitle}>{col.title}</div>
-                {col.cards.map((card) => {
-                  const idx = cardIndex++;
-                  return (
-                    <div
-                      key={card.id}
-                      className={styles.card}
-                      ref={(el) => { cardRefs.current[idx] = el; }}
-                    >
-                      <div className={`${styles.cardTag} ${card.tagClass}`}>{card.tag}</div>
-                      <div className={styles.cardText}>{card.text}</div>
-                      <div className={styles.cardFooter}>
-                        <div className={styles.avatar} style={{ background: card.color }}>
-                          {card.avatar}
-                        </div>
-                      </div>
+      <div className={styles.columns}>
+        {BOARD_DATA.map((col) => (
+          <div key={col.title} className={styles.column}>
+            <div className={styles.columnTitle}>{col.title}</div>
+            {col.cards.map((card) => {
+              const idx = cardIndex++;
+              return (
+                <div
+                  key={card.id}
+                  className={styles.card}
+                  ref={(el) => { cardRefs.current[idx] = el; }}
+                >
+                  <div className={`${styles.cardTag} ${card.tagClass}`}>{card.tag}</div>
+                  <div className={styles.cardText}>{card.text}</div>
+                  <div className={styles.cardFooter}>
+                    <div className={styles.avatar} style={{ background: card.color }}>
+                      {card.avatar}
                     </div>
-                  );
-                })}
-              </div>
-            ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        </div>
-      </section>
-
+        ))}
+      </div>
+    </div>
+  </div>
+</section>
       <section className={styles.features}>
         <div className={styles.sectionHeader}>
           <div className={styles.sectionLabel}>Built for teams</div>

@@ -88,3 +88,55 @@ export const getBoard = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: "Server error" });
   }
 };
+
+export const updateBoard = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const { name } = req.body;
+  const userId = req.userId!;
+  try {
+    const board = await query("SELECT * FROM boards WHERE id = $1", [id]);
+    if (board.rows.length === 0) {
+      res.status(404).json({ error: "Board not found" });
+      return;
+    }
+    const member = await query(
+      "SELECT role FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [board.rows[0].workspace_id, userId]
+    );
+    if (member.rows[0]?.role !== "admin") {
+      res.status(403).json({ error: "Only admins can rename boards" });
+      return;
+    }
+    const result = await query(
+      "UPDATE boards SET name = $1 WHERE id = $2 RETURNING *",
+      [name, id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+export const deleteBoard = async (req: AuthRequest, res: Response) => {
+  const { id } = req.params;
+  const userId = req.userId!;
+  try {
+    const board = await query("SELECT * FROM boards WHERE id = $1", [id]);
+    if (board.rows.length === 0) {
+      res.status(404).json({ error: "Board not found" });
+      return;
+    }
+    const member = await query(
+      "SELECT role FROM workspace_members WHERE workspace_id = $1 AND user_id = $2",
+      [board.rows[0].workspace_id, userId]
+    );
+    if (member.rows[0]?.role !== "admin") {
+      res.status(403).json({ error: "Only admins can delete boards" });
+      return;
+    }
+    await query("DELETE FROM boards WHERE id = $1", [id]);
+    res.json({ message: "Board deleted" });
+  } catch (err) {
+    res.status(500).json({ error: "Server error" });
+  }
+};
